@@ -45,7 +45,7 @@ function writeDebugLog(fileName, data) {
     content = data;
   }
 
-  fs.writeFileSync(path.resolve(process.cwd(), "./out/", fileName), content, {
+  fs.writeFileSync(path.resolve(process.cwd(), "./log/", fileName), content, {
     encoding: "utf-8",
   });
 }

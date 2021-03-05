@@ -10,6 +10,7 @@ class CodeServiceFactory {
   constructor() {
     this.config;
     this.allFiles = [];
+    this.fuzzyCount = 0;
     this.allTranslations = [];
     this.translationObject = {};
     this.matchErrorTranslations = [];
@@ -28,25 +29,35 @@ class CodeServiceFactory {
       const fileContent = fs.readFileSync(file, {
         encoding: "utf-8",
       });
+      const shortFile = file.replace(this.config.path, "");
+
+      const fuzzyCount = (fileContent.match(/i18nTranslate\(/g) || []).length;
+      this.fuzzyCount += fuzzyCount;
 
       const rawItems =
-        fileContent.replace(/\n/g, "").match(/i18nTranslate\(('|").*?\}?\)/g) ||
+        fileContent.replace(/\n/g, "").match(/i18nTranslate\(([^\(\)]*)\)/g) ||
         [];
+      // .match(/(i18nTranslate\()(\s*)('|").*?\}?\)/g)
+
+      if (fuzzyCount !== rawItems.length) {
+        utils.writeDebugLog("fileContent", fileContent.replace(/\n/g, ""));
+        console.warn(`==> Warn: ${shortFile} ${rawItems.length}/${fuzzyCount}`);
+      }
 
       rawItems.forEach((current) => {
-        const n = current.match(/('|"|'\\|"\\)\S+('|"|'\\|"\\)/g);
+        const n = current.match(/('|"|'\\|"\\|`).+?('|"|'\\|"\\|`)/g);
         if (n && n.length === 2) {
           const rawKey = n[0].replace(/'|"|'\\|"\\/g, "");
           const text = n[1].replace(/'|"|'\\|"\\/g, "");
           this.allTranslations.push({
             rawKey,
             text,
-            file: file.replace(this.config.path, ""),
+            file: shortFile,
           });
         } else {
           this.matchErrorTranslations.push({
             content: current,
-            file,
+            file: shortFile,
           });
         }
       });
@@ -58,11 +69,19 @@ class CodeServiceFactory {
     );
 
     console.log(
-      `==> Code match: ${this.allTranslations.length} found, ${this.matchErrorTranslations.length} errors.`
+      `==> Code Parser: ${this.fuzzyCount} found / ${
+        this.fuzzyCount - this.allTranslations.length
+      } miss / ${this.matchErrorTranslations.length} errors.`
+    );
+    utils.writeDebugLog(
+      "code-match-error",
+      this.matchErrorTranslations.map(
+        (n) => `${n.content.replace(/ /g, "")}\n${n.file}\n`
+      )
     );
 
     if (this.matchErrorTranslations.length > 0) {
-    //   process.exit(1);
+      //   process.exit(1);
     }
   }
 
@@ -87,13 +106,10 @@ class CodeServiceFactory {
         this.allTranslations.length - this.combineErrorTranslations.length
       } success, ${this.combineErrorTranslations.length} errors.`
     );
-    utils.writeDebugLog("code.allTranslations", this.allTranslations);
-    utils.writeDebugLog(
-      "code.combineErrorTranslations",
-      this.combineErrorTranslations
-    );
+    utils.writeDebugLog("code-match-translations", this.allTranslations);
+    utils.writeDebugLog("code-combine-error", this.combineErrorTranslations);
     if (this.combineErrorTranslations.length > 0) {
-    //   process.exit(1);
+      //   process.exit(1);
     }
 
     return this.translationObject;

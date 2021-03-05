@@ -5,11 +5,12 @@ const { ArgumentParser } = require("argparse");
 const { version } = require("./package.json");
 const tasks = require("./src/main");
 
-console.log("==> k18n start!!!");
 
 const args = combineProcessArgs();
 args.processCwd = process.cwd();
-console.table(args);
+
+console.log("==> k18n start!!!");
+// console.table(args);
 
 switch (args.command) {
   case "c2e":

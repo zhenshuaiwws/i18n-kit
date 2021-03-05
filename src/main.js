@@ -35,7 +35,7 @@ async function taskCodeToExcel(args) {
 
   await excelService.init(params.excel);
   excelService.getLastRowNumber();
-  excelService.insetRow(_.uniqBy(codeService.allTranslations, "rawKey"));
+  excelService.insetRow(_.sortBy(_.uniqBy(codeService.allTranslations, "rawKey"),'file'));
   await excelService.outToFile();
 
   console.log("==> Success!!!");

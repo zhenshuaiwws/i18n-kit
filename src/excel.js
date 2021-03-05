@@ -50,7 +50,7 @@ class ExcelServiceFactory {
         const rowValues = [];
         rowValues[this.config.pathColumnKey] = n.rawKey;
         rowValues[this.config.langColumnKey] = n.text;
-        rowValues[this.config.fileColumnKey] = n.file;
+        rowValues[this.config.fileColumnKey] = n.shortFile;
         this.worksheet.insertRow(this.lastRowNumber + i + 1, rowValues);
 
         this.insertCount++;

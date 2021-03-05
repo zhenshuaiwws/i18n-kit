@@ -11,7 +11,7 @@ const args = utils.getProcessArgv();
 console.log(`==>args:`, args);
 
 const files = utils.findDirFiles(path.resolve(__dirname, args[1]));
-writeDebugLog("1filesPath", files.join("\n"));
+writeDebugLog("filesPath", files.join("\n"));
 
 let translationRawItems = [];
 const translationItems = [];
