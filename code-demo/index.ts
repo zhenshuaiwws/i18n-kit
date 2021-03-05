@@ -1,0 +1,34 @@
+class Book {
+  constructor(x) {}
+}
+
+function i18nTranslate(a: any, b: any, c?: any) {
+  console.log(a, b, c);
+
+  return "";
+}
+
+const aa: any = i18nTranslate("common.ok", "确定1");
+
+const bb = {
+  name: i18nTranslate("common.ok", "确定2"),
+};
+const cc = [1, i18nTranslate("common.ok", "确定3"), 2];
+
+console.log(i18nTranslate("position.positionManage", "职位管理4"));
+
+console.log(i18nTranslate("position.positionManage", "职位{n}个5", { n: 10 }));
+
+console.log(
+  i18nTranslate("position.positionManage", "职位{n}个6", {
+    n: 10,
+  })
+);
+
+new Book({
+  p: i18nTranslate("position.positionManage", "职位{n}个7", {
+    n: 10,
+  }),
+});
+
+alert();
