@@ -1,41 +1,59 @@
 #!/usr/bin/env node
-"use strict";
 
-const { ArgumentParser } = require("argparse");
+const path = require("path");
+const { Command, Option } = require("commander");
+const term = require("terminal-kit").terminal;
 const { version } = require("./package.json");
 const tasks = require("./src/main");
 
+const program = new Command();
+program.version(version);
 
-const args = combineProcessArgs();
-args.processCwd = process.cwd();
+const dartOption = new Option("-d, --dart");
 
-console.log("==> k18n start!!!");
-// console.table(args);
-
-switch (args.command) {
-  case "c2e":
-    tasks.taskCodeToExcel(args).then();
-    break;
-}
-
-function combineProcessArgs() {
-  const parser = new ArgumentParser({
-    description: "k18n cli",
+program
+  .command("c2e")
+  .addOption(dartOption)
+  .requiredOption("-cp, --code-path <path>", "")
+  .requiredOption("-ep, --excel-path <path>", "")
+  .requiredOption("-ew, --excel-worksheet-index <number>", "")
+  .requiredOption("-ek, --excel-key-column-index <number>", "")
+  .option("-el, --excel-lang-column-index <number>", "")
+  .option("-ef, --excel-file-column-index <number>", "")
+  .action((args) => {
+    term.bold("░░░░░░ i18n-kit run!!!");
+    term(`\n`);
+    tasks.taskCodeToExcel(formatArgs(args)).then(() => {
+      term.bold("░░░░░░ done.\n");
+    });
   });
-  parser.add_argument("command", { help: "c2j,j2e" });
-  parser.add_argument("-v", { action: "version", version });
-  parser.add_argument("-c", "--code", { help: "code dir" });
-  parser.add_argument("-e", "--excel", {
-    help: "excel file",
-    nargs: 5,
-    metavar: ["PATH", "WORKSHEET", "KEY", "LANG", "FILE"],
-  });
-  parser.add_argument("-j", "--json", { help: "i18n json file" });
+program.parse(process.argv);
 
-  const result = parser.parse_args();
-  result.excel = result.excel.map((n, i) => {
-   return i > 0 ? Number(n) : n;
+function formatArgs(args) {
+  const needConvertToNumberKey = [
+    "excelWorksheetIndex",
+    "excelKeyColumnIndex",
+    "excelLangColumnIndex",
+    "excelFileColumnIndex",
+  ];
+  needConvertToNumberKey.forEach((n) => {
+    if (args[n] === undefined) {
+      return;
+    }
+    args[n] = Number(args[n]);
   });
 
-  return result;
+  const needConvertToBooleanKey = ["logError"];
+  needConvertToBooleanKey.forEach((n) => {
+    args[n] = !(args[n] === "false");
+  });
+
+  const processCwd = process.cwd();
+  args.processCwd = processCwd;
+
+  if (!path.isAbsolute(args.codePath)) {
+    args.codePath = path.resolve(processCwd, args.codePath);
+  }
+
+  return args;
 }

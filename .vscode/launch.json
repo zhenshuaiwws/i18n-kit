@@ -12,14 +12,19 @@
       "program": "${workspaceFolder}/index.js",
       "args": [
         "c2e",
-        "-c",
+        "-cp",
         "../is-recruit-fe/src",
-        "-e",
+        "-ep",
         "/Users/zhenshuai/Desktop/test.xlsx",
+        "-ew",
         "0",
+        "-ek",
         "1",
+        "-el",
         "2",
-        "3"
+        "-ef",
+        "3",
+        "--dart"
       ]
     }
   ]

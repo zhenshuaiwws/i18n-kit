@@ -3,6 +3,7 @@
 const fs = require("fs");
 const path = require("path");
 const _ = require("lodash");
+const term = require("terminal-kit").terminal;
 const ExcelJS = require("exceljs");
 const utils = require("./utils");
 
@@ -19,17 +20,20 @@ class CodeServiceFactory {
 
   init(config) {
     this.config = config;
-    this._findAllFiles();
+    this.findAllFiles();
   }
 
-  async check() {}
+  findAllFiles() {
+    this.allFiles = utils.findDirFiles(this.config.codePath);
+    term(`=> Code find: ${this.allFiles.length} files(.ts,.js) \n`);
+  }
 
   findAllTranslation() {
     this.allFiles.forEach((file) => {
       const fileContent = fs.readFileSync(file, {
         encoding: "utf-8",
       });
-      const shortFile = file.replace(this.config.path, "");
+      const shortFile = file.replace(this.config.codePath, "");
 
       const fuzzyCount = (fileContent.match(/i18nTranslate\(/g) || []).length;
       this.fuzzyCount += fuzzyCount;
@@ -41,7 +45,12 @@ class CodeServiceFactory {
 
       if (fuzzyCount !== rawItems.length) {
         utils.writeDebugLog("fileContent", fileContent.replace(/\n/g, ""));
-        console.warn(`==> Warn: ${shortFile} ${rawItems.length}/${fuzzyCount}`);
+        utils.commandLogError(
+          this.config.dart,
+          `=> Code parser miss: ${shortFile} ${
+            fuzzyCount - rawItems.length
+          } miss`
+        );
       }
 
       rawItems.forEach((current) => {
@@ -52,13 +61,19 @@ class CodeServiceFactory {
           this.allTranslations.push({
             rawKey,
             text,
-            file: shortFile,
+            file,
+            shortFile,
           });
         } else {
           this.matchErrorTranslations.push({
             content: current,
-            file: shortFile,
+            file,
+            shortFile,
           });
+          utils.commandLogError(
+            this.config.dart,
+            `=> Code parser error: ${file} ${current}`
+          );
         }
       });
     });
@@ -68,56 +83,53 @@ class CodeServiceFactory {
       _.sortBy(this.allTranslations, (n) => n.rawKey.length)
     );
 
-    console.log(
-      `==> Code Parser: ${this.fuzzyCount} found / ${
+    term.bold.brightYellow(
+      `=> Code parser: ${this.fuzzyCount} pass / ${
         this.fuzzyCount - this.allTranslations.length
-      } miss / ${this.matchErrorTranslations.length} errors.`
+      } miss / ${this.matchErrorTranslations.length} error.`
     );
+    term(`\n`);
     utils.writeDebugLog(
       "code-match-error",
       this.matchErrorTranslations.map(
         (n) => `${n.content.replace(/ /g, "")}\n${n.file}\n`
       )
     );
-
-    if (this.matchErrorTranslations.length > 0) {
-      //   process.exit(1);
-    }
   }
 
   combineTranslationObject() {
     this.allTranslations.forEach((n) => {
       const find = _.get(this.translationObject, n.rawKey);
       if (_.isObject(find)) {
-        n.error = "key冲突，已经存在类似，会导致覆盖其他翻译";
+        n.error = "key冲突(类似的key会导致覆盖丢失其他翻译)";
         this.combineErrorTranslations.push(n);
+        utils.commandLogError(
+          this.config.dart,
+          `=> Code traverse error: ${n.rawKey} ${n.error}`
+        );
         return;
       }
       if (find && find !== n.text) {
         n.error = "同key不同翻译";
         this.combineErrorTranslations.push(n);
+        utils.commandLogError(
+          this.config.dart,
+          `=> Code traverse error: ${n.rawKey} ${n.error}`
+        );
         return;
       }
       _.set(this.translationObject, n.rawKey, n.text);
     });
 
-    console.error(
-      `==> Code generator: ${
+    term.bgBlack.brightYellow.bold(
+      `=> Code traverse: ${
         this.allTranslations.length - this.combineErrorTranslations.length
-      } success, ${this.combineErrorTranslations.length} errors.`
+      } success, ${this.combineErrorTranslations.length} error. \n`
     );
     utils.writeDebugLog("code-match-translations", this.allTranslations);
     utils.writeDebugLog("code-combine-error", this.combineErrorTranslations);
-    if (this.combineErrorTranslations.length > 0) {
-      //   process.exit(1);
-    }
 
     return this.translationObject;
-  }
-
-  _findAllFiles() {
-    this.allFiles = utils.findDirFiles(this.config.path);
-    console.log(`==> Code: ${this.allFiles.length} files found.`);
   }
 }
 

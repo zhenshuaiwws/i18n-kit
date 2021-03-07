@@ -14,31 +14,19 @@ async function taskCheckCode() {}
  * 从Code中查找翻译项，输出到Excel中
  */
 async function taskCodeToExcel(args) {
-  const params = {
-    excel: {
-      path: path.resolve(args.processCwd, args.excel[0]),
-      worksheetNumber: args.excel[1],
-      pathColumnKey: args.excel[2],
-      langColumnKey: args.excel[3],
-      fileColumnKey: args.excel[4],
-    },
-    code: {
-      path: path.resolve(args.processCwd, args.code),
-    },
-  };
-
-  await codeService.check();
-
-  codeService.init(params.code);
+  codeService.init(args);
   codeService.findAllTranslation();
   codeService.combineTranslationObject();
 
-  await excelService.init(params.excel);
+  await excelService.init(args);
   excelService.getLastRowNumber();
-  excelService.insetRow(_.sortBy(_.uniqBy(codeService.allTranslations, "rawKey"),'file'));
-  await excelService.outToFile();
+  excelService.insetRow(
+    _.sortBy(_.uniqBy(codeService.allTranslations, "rawKey"), "file")
+  );
 
-  console.log("==> Success!!!");
+  if (!args.dart) {
+    await excelService.outToFile();
+  }
 }
 
 function taskCodeToJson() {}

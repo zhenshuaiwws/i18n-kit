@@ -1,10 +1,7 @@
 const fs = require("fs");
 const path = require("path");
 const _ = require("lodash");
-
-function getProcessArgv() {
-  return process.argv.slice(2);
-}
+const term = require("terminal-kit").terminal;
 
 function findDirFiles(parentDirPath) {
   const allFilePaths = [];
@@ -50,8 +47,16 @@ function writeDebugLog(fileName, data) {
   });
 }
 
+function commandLogError(isShow, content) {
+  if (!isShow) {
+    return;
+  }
+  term.brightRed(content);
+  term("\n");
+}
+
 module.exports = {
-  getProcessArgv,
+  commandLogError,
   findDirFiles,
   writeDebugLog,
 };
