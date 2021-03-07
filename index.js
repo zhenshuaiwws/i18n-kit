@@ -21,11 +21,31 @@ program
   .option("-el, --excel-lang-column-index <number>", "")
   .option("-ef, --excel-file-column-index <number>", "")
   .action((args) => {
-    term.bold("░░░░░░ i18n-kit run!!!");
-    term(`\n`);
-    tasks.taskCodeToExcel(formatArgs(args)).then(() => {
-      term.bold("░░░░░░ done.\n");
-    });
+    const config = formatArgs(args);
+    if (config.dart) {
+      main();
+    } else {
+      term.bgBlack.bold("当前非模拟运行(建议做好文件备份)，是否继续？ [Y|n]\n");
+      term.yesOrNo(
+        { yes: ["y", "ENTER"], no: ["n"] },
+        function (error, result) {
+          if (result) {
+            main();
+          } else {
+            process.exit();
+          }
+        }
+      );
+    }
+
+    function main() {
+      term.clear();
+      term.bold("░░░░░░ i18n-kit run!!!");
+      term(`\n`);
+      tasks.taskCodeToExcel(config).then(() => {
+        term.bold("░░░░░░ done.\n");
+      });
+    }
   });
 program.parse(process.argv);
 
