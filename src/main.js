@@ -19,13 +19,11 @@ async function taskCodeToExcel(args) {
   codeService.combineTranslationObject();
 
   await excelService.init(args);
-  excelService.getLastRowNumber();
-  excelService.insetRow(
+  excelService.execute(
     _.sortBy(_.uniqBy(codeService.allTranslations, "rawKey"), "file")
   );
-
   if (!args.dart) {
-    await excelService.outToFile();
+    await excelService.exportToFile();
   }
 }
 
