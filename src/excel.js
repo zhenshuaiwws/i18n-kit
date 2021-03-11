@@ -1,7 +1,5 @@
 "use strict";
 
-const fs = require("fs");
-const path = require("path");
 const _ = require("lodash");
 const term = require("terminal-kit").terminal;
 const ExcelJS = require("exceljs");

@@ -1,136 +1,123 @@
 "use strict";
 
 const fs = require("fs");
-const path = require("path");
 const _ = require("lodash");
 const term = require("terminal-kit").terminal;
-const ExcelJS = require("exceljs");
+const singleLineLog = require("single-line-log").stdout;
+
 const utils = require("./utils");
+const babelParse = require("@babel/parser").parse;
+const babelTraverse = require("@babel/traverse").default;
 
 class CodeServiceFactory {
   constructor() {
     this.config;
-    this.allFiles = [];
-    this.fuzzyCount = 0;
-    this.allTranslations = [];
+    // 所有文件路径
+    this.files = [];
+    // 所有 i18nTranslate 翻译项
+    this.translations = [];
+    // 所有 i18nTranslate 翻译项的对象
     this.translationObject = {};
-    this.matchErrorTranslations = [];
-    this.combineErrorTranslations = [];
+    // 转化为对象时的错误
+    this.errorTranslations = [];
   }
 
   init(config) {
     this.config = config;
-    this.findAllFiles();
+    this.findAllFile();
+    this.findTranslationsInAllFiles();
+    this.combineToTranslationObject();
+    // 去重
+    // this.translations = _.uniqBy(this.translations, "rawKey");
+    // 按照rawKey长度排序，以此用来判断“key冲突”的错误
+    this.translations = _.reverse(
+      _.sortBy(_.uniqBy(this.translations, "rawKey"), (n) => n.rawKey.length)
+    );
+    term.bgBlack.brightYellow.bold(
+      `=> Code: ${this.translations.length} pass, ${this.errorTranslations.length} error.\n`
+    );
   }
 
-  findAllFiles() {
-    this.allFiles = utils.findDirFiles(this.config.codePath);
-    term(`=> Code find: ${this.allFiles.length} files(.ts,.js) \n`);
-  }
-
-  findAllTranslation() {
-    this.allFiles.forEach((file) => {
-      const fileContent = fs.readFileSync(file, {
-        encoding: "utf-8",
+  findAllFile() {
+    this.files = utils.findDirFiles(this.config.codeFolderPath);
+    if (this.config.codeExcluded) {
+      this.files = this.files.filter((path) => {
+        let isIncludes;
+        this.config.codeExcluded.forEach((k) => {
+          if (isIncludes) {
+            return false;
+          } else if (path.includes(k)) {
+            isIncludes = true;
+          }
+        });
+        return !isIncludes;
       });
-      const shortFile = file.replace(this.config.codePath, "");
+    }
+    term(`=> Code find: ${this.files.length} files(.ts,.js).\n`);
+    utils.writeDebugLog("files", this.files);
+  }
 
-      const fuzzyCount = (fileContent.match(/i18nTranslate\(/g) || []).length;
-      this.fuzzyCount += fuzzyCount;
+  findTranslateInFile(file) {
+    const fileContent = fs.readFileSync(file, {
+      encoding: "utf-8",
+    });
 
-      const rawItems =
-        fileContent.replace(/\n/g, "").match(/i18nTranslate\(([^\(\)]*)\)/g) ||
-        [];
-      // .match(/(i18nTranslate\()(\s*)('|").*?\}?\)/g)
+    const shortFile = file.replace(this.config.codeFolderPath, "");
 
-      if (fuzzyCount !== rawItems.length) {
-        utils.writeDebugLog("fileContent", fileContent.replace(/\n/g, ""));
-        utils.commandLogError(
-          this.config.dart,
-          `=> Code parser miss: ${shortFile} ${
-            fuzzyCount - rawItems.length
-          } miss`
-        );
-      }
+    const ast = babelParse(fileContent, {
+      sourceType: "module",
+      plugins: ["jsx", "typescript", "classProperties", "decorators-legacy"],
+      presets: ["@babel/preset-typescript"],
+    });
 
-      rawItems.forEach((current) => {
-        const n = current.match(/('|"|'\\|"\\|`).+?('|"|'\\|"\\|`)/g);
-        if (n && n.length === 2) {
-          const rawKey = n[0].replace(/'|"|'\\|"\\/g, "");
-          const text = n[1].replace(/'|"|'\\|"\\/g, "");
-          this.allTranslations.push({
+    babelTraverse(ast, {
+      CallExpression: (path) => {
+        if (path.node.callee.name === "i18nTranslate") {
+          const rawKey = path.node.arguments[0].value;
+          const text = path.node.arguments[1].value;
+          this.translations.push({
             rawKey,
             text,
             file,
             shortFile,
           });
-        } else {
-          this.matchErrorTranslations.push({
-            content: current,
-            file,
-            shortFile,
-          });
-          utils.commandLogError(
-            this.config.dart,
-            `=> Code parser error: ${file} ${current}`
-          );
         }
-      });
+      },
     });
-
-    // 按照rawKey长度排序，以此用来判断“key冲突”的错误
-    this.allTranslations = _.reverse(
-      _.sortBy(this.allTranslations, (n) => n.rawKey.length)
-    );
-
-    term.bold.brightYellow(
-      `=> Code parser: ${this.fuzzyCount} pass / ${
-        this.fuzzyCount - this.allTranslations.length
-      } miss / ${this.matchErrorTranslations.length} error.`
-    );
-    term(`\n`);
-    utils.writeDebugLog(
-      "code-match-error",
-      this.matchErrorTranslations.map(
-        (n) => `${n.content.replace(/ /g, "")}\n${n.file}\n`
-      )
-    );
   }
 
-  combineTranslationObject() {
-    this.allTranslations.forEach((n) => {
+  findTranslationsInAllFiles() {
+    this.files.forEach((file) => {
+      singleLineLog(file + "\n");
+      this.findTranslateInFile(file);
+      singleLineLog("");
+    });
+  }
+
+  combineToTranslationObject() {
+    this.translations.forEach((n) => {
       const find = _.get(this.translationObject, n.rawKey);
       if (_.isObject(find)) {
         n.error = "key冲突(类似的key会导致覆盖丢失其他翻译)";
-        this.combineErrorTranslations.push(n);
+        this.errorTranslations.push(n);
         utils.commandLogError(
-          this.config.dart,
+          this.config.dryRun,
           `=> Code traverse error: ${n.rawKey} ${n.error}`
         );
-        return;
-      }
-      if (find && find !== n.text) {
+      } else if (find && find !== n.text) {
         n.error = "同key不同翻译";
-        this.combineErrorTranslations.push(n);
+        this.errorTranslations.push(n);
         utils.commandLogError(
-          this.config.dart,
+          this.config.dryRun,
           `=> Code traverse error: ${n.rawKey} ${n.error}`
         );
-        return;
+      } else {
+        _.set(this.translationObject, n.rawKey, n.text);
       }
-      _.set(this.translationObject, n.rawKey, n.text);
     });
-
-    term.bgBlack.brightYellow.bold(
-      `=> Code traverse: ${
-        this.allTranslations.length - this.combineErrorTranslations.length
-      } success, ${this.combineErrorTranslations.length} error. \n`
-    );
-    utils.writeDebugLog("code-match-translations", this.allTranslations);
-    utils.writeDebugLog("code-combine-error", this.combineErrorTranslations);
-
-    return this.translationObject;
   }
+
+  // repleaceCode
 }
 
 module.exports = new CodeServiceFactory();

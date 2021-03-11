@@ -1,6 +1,6 @@
 {
   "name": "i18n-kit",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -12,10 +12,16 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@babel/parser": "^7.13.10",
+    "@babel/plugin-proposal-decorators": "^7.13.5",
+    "@babel/plugin-transform-typescript": "^7.13.0",
+    "ast-query": "^2.0.0",
+    "babel-traverse": "^6.26.0",
     "commander": "^7.1.0",
     "esprima": "^4.0.1",
     "exceljs": "^4.2.0",
     "lodash": "^4.17.21",
+    "single-line-log": "^1.1.2",
     "terminal-kit": "^2.0.5"
   }
 }

@@ -1,38 +1,40 @@
 "use strict";
 
-const fs = require("fs");
-const path = require("path");
 const _ = require("lodash");
-const ExcelJS = require("exceljs");
-
 const excelService = require("./excel");
 const codeService = require("./code");
 
-async function taskCheckCode() {}
+/**
+ * 从 Code 中查找翻译项，输出到 Json 中
+ */
+async function taskCodeToJson() {}
 
 /**
- * 从Code中查找翻译项，输出到Excel中
+ * 从 Code 中查找翻译项，输出到 Excel 中
  */
 async function taskCodeToExcel(args) {
   codeService.init(args);
-  codeService.findAllTranslation();
-  codeService.combineTranslationObject();
 
   await excelService.init(args);
-  excelService.execute(
-    _.sortBy(_.uniqBy(codeService.allTranslations, "rawKey"), "file")
-  );
-  if (!args.dart) {
+  excelService.execute(_.sortBy(codeService.translations, "file"));
+  if (!args.dryRun) {
     await excelService.exportToFile();
   }
 }
 
-function taskCodeToJson() {}
+/**
+ * 把 Excel 中的翻译项，输出到 Json 中
+ */
+async function taskExcelToJson() {}
 
-function taskExcelToJson() {}
-
+/**
+ * 把 Json 中的翻译项，同步到 Code 中
+ */
 async function taskJsonToCode() {}
 
 module.exports = {
+  taskCodeToJson,
   taskCodeToExcel,
+  taskExcelToJson,
+  taskJsonToCode,
 };

@@ -2,8 +2,8 @@
 "use strict";
 
 const { ArgumentParser } = require("argparse");
-const { version } = require("./package.json");
-const tasks = require("./src/main");
+const { version } = require("../package.json");
+const tasks = require("../src/main");
 
 
 const args = combineProcessArgs();

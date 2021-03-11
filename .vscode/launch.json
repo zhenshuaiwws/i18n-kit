@@ -7,13 +7,17 @@
     {
       "type": "pwa-node",
       "request": "launch",
-      "name": "Launch Program",
+      "name": "code 2 excel",
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}/index.js",
       "args": [
         "c2e",
         "-cp",
         "../is-recruit-fe/src",
+        "--code-excluded",
+        "src/campus-services",
+        "src/services",
+        "src/locales",
         "-ep",
         "/Users/zhenshuai/Desktop/test.xlsx",
         "-ew",
@@ -24,7 +28,26 @@
         "2",
         "-ef",
         "3",
-        "--dart"
+        "--dry-run"
+      ]
+    },
+    {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "code 2 json",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}/index.js",
+      "args": [
+        "c2j",
+        "-cp",
+        "../is-recruit-fe/src",
+        "--code-excluded",
+        "src/campus-services",
+        "src/services",
+        "src/locales",
+        "-jp",
+        "/Users/zhenshuai/Desktop/en.json",
+        "--dry-run"
       ]
     }
   ]
