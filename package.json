@@ -2,15 +2,18 @@
   "name": "i18n-kit",
   "version": "0.0.2",
   "description": "",
+  "author": "zhenshuai",
   "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
   "bin": {
     "i18n-kit": "index.js"
   },
-  "author": "",
-  "license": "ISC",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "c2e": "node index.js c2e -cp ../is-recruit-fe/src -ce src/campus-services src/services src/locales -ep /Users/zhenshuai/Desktop/test.xlsx -ew 1 -ek 1 -el 2 -ef 3",
+    "c2j": "node index.js c2j -cp ../is-recruit-fe/src -ce src/campus-services src/services src/locales -jp /Users/zhenshuai/Desktop/en.json",
+    "e2j": "node index.js e2j -ep /Users/zhenshuai/Desktop/test.xlsx -ew 1 -ek 1 -el 2 -jp /Users/zhenshuai/Desktop/en.json"
+  },
+  "license": "MIT",
   "dependencies": {
     "@babel/parser": "^7.13.10",
     "@babel/plugin-proposal-decorators": "^7.13.5",
@@ -20,8 +23,10 @@
     "commander": "^7.1.0",
     "esprima": "^4.0.1",
     "exceljs": "^4.2.0",
+    "fs-extra": "^9.1.0",
     "lodash": "^4.17.21",
     "single-line-log": "^1.1.2",
     "terminal-kit": "^2.0.5"
-  }
+  },
+  "devDependencies": {}
 }

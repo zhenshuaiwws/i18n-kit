@@ -14,6 +14,7 @@ const dryRunOption = new Option(
   "--dry-run",
   "Run command without saving the changes to the file system"
 );
+const debuggerOption = new Option("--debugger", "debugger");
 
 const codeOptionMap = {
   codeFolderPath: new Option(
@@ -63,6 +64,7 @@ program
   .description(
     "Code to Excel, find translation items from the code and output them to excel file."
   )
+  .addOption(debuggerOption)
   .addOption(dryRunOption)
   .addOption(codeOptionMap.codeFolderPath)
   .addOption(codeOptionMap.codeExcluded)
@@ -84,6 +86,7 @@ program
   .description(
     "Code to JSON, find translation items from the code and output them to lang JSON file."
   )
+  .addOption(debuggerOption)
   .addOption(dryRunOption)
   .addOption(codeOptionMap.codeFolderPath)
   .addOption(codeOptionMap.codeExcluded)
@@ -101,6 +104,7 @@ program
   .description(
     "Excel to JSON, read the translation items in excel file and output to JSON."
   )
+  .addOption(debuggerOption)
   .addOption(dryRunOption)
   .addOption(excelOptionMap.excelPath)
   .addOption(excelOptionMap.excelWorksheetIndex)

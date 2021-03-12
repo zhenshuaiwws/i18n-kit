@@ -7,6 +7,7 @@ const singleLineLog = require("single-line-log").stdout;
 
 const utils = require("./utils");
 const babelParse = require("@babel/parser").parse;
+const babelGenerator = require("@babel/generator").default;
 const babelTraverse = require("@babel/traverse").default;
 
 class CodeServiceFactory {
@@ -23,6 +24,7 @@ class CodeServiceFactory {
   }
 
   init(config) {
+    term("=> Code...\n");
     this.config = config;
     this.findAllFile();
     this.findTranslationsInAllFiles();
@@ -73,8 +75,29 @@ class CodeServiceFactory {
     babelTraverse(ast, {
       CallExpression: (path) => {
         if (path.node.callee.name === "i18nTranslate") {
-          const rawKey = path.node.arguments[0].value;
-          const text = path.node.arguments[1].value;
+          const args = path.node.arguments;
+          let rawKey = args[0].value;
+          let text;
+
+          if (args[1].type !== "StringLiteral") {
+            text = babelGenerator(args[1]).code;
+          } else {
+            text = args[1].value;
+          }
+
+          if (args[0].type === "StringLiteral") {
+            rawKey = args[0].value;
+          } else {
+            this.errorTranslations.push({
+              rawKey,
+              text,
+              file,
+              shortFile,
+              error: "key必须为基本String类型",
+            });
+            return;
+          }
+
           this.translations.push({
             rawKey,
             text,

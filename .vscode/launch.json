@@ -47,7 +47,28 @@
         "src/locales",
         "-jp",
         "/Users/zhenshuai/Desktop/en.json",
-        "--dry-run"
+        "--debugger"
+      ]
+    },
+    {
+      "type": "pwa-node",
+      "request": "launch",
+      "name": "excel 2 json",
+      "skipFiles": ["<node_internals>/**"],
+      "program": "${workspaceFolder}/index.js",
+      "args": [
+        "e2j",
+        "-ep",
+        "/Users/zhenshuai/Desktop/test.xlsx",
+        "-ew",
+        "1",
+        "-ek",
+        "1",
+        "-el",
+        "2",
+        "-jp",
+        "/Users/zhenshuai/Desktop/en.json",
+        "--debugger"
       ]
     }
   ]

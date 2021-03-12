@@ -3,6 +3,7 @@
 const _ = require("lodash");
 const term = require("terminal-kit").terminal;
 const ExcelJS = require("exceljs");
+const utils = require("./utils");
 
 class ExcelServiceFactory {
   constructor() {
@@ -14,20 +15,22 @@ class ExcelServiceFactory {
 
     this.lastRowNumber = null;
 
-    this.pathColumns = [];
-
-    this.keyRowTexts = null;
-
     this.insertCount = 0;
 
     this.updateCount = 0;
 
     this.ignoreCount = 0;
 
-    this.originalExcelTranslations = [];
+    this.translations = [];
+
+    this.translationObject = {};
+
+    this.errorTranslations = [];
   }
 
   async init(config) {
+    term("=> Excel...\n");
+
     this.config = config;
 
     const worksheets = await this.workbook.xlsx.readFile(config.excelPath);
@@ -40,6 +43,7 @@ class ExcelServiceFactory {
    * 读取 Excel 中的数据
    */
   readFromExcel() {
+    term("=> Excel: read file\n");
     const columns = this.worksheet.getColumn(this.config.excelKeyColumnIndex);
     this.lastRowNumber = columns.values.length;
 
@@ -55,13 +59,13 @@ class ExcelServiceFactory {
       if (this.config.excelFileColumnIndex) {
         item.shortFile = row.getCell(this.config.excelFileColumnIndex).text;
       }
-      this.originalExcelTranslations.push(item);
+      this.translations.push(item);
     });
   }
 
   execute(translations) {
     translations.forEach((n, i) => {
-      const findIndex = _.findIndex(this.originalExcelTranslations, {
+      const findIndex = _.findIndex(this.translations, {
         rawKey: n.rawKey,
       });
       if (findIndex === -1) {
@@ -129,6 +133,29 @@ class ExcelServiceFactory {
   //   });
   //   return index + 1;
   // }
+
+  combineToTranslationObject() {
+    this.translations.forEach((n) => {
+      const find = _.get(this.translationObject, n.rawKey);
+      if (_.isObject(find)) {
+        n.error = "key冲突(类似的key会导致覆盖丢失其他翻译)";
+        this.errorTranslations.push(n);
+        utils.commandLogError(
+          this.config.dryRun,
+          `=> Excel traverse error: ${n.rawKey} ${n.error}`
+        );
+      } else if (find && find !== n.text) {
+        n.error = "同key不同翻译";
+        this.errorTranslations.push(n);
+        utils.commandLogError(
+          this.config.dryRun,
+          `=> Excel traverse error: ${n.rawKey} ${n.error}`
+        );
+      } else {
+        _.set(this.translationObject, n.rawKey, n.text);
+      }
+    });
+  }
 
   async exportToFile() {
     await this.workbook.xlsx.writeFile(this.config.excelPath, this.workbook);

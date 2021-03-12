@@ -47,8 +47,8 @@ function writeDebugLog(fileName, data) {
   });
 }
 
-function commandLogError(isShow, content) {
-  if (!isShow) {
+function commandLogError(isIgnore, content) {
+  if (isIgnore) {
     return;
   }
   term.brightRed(content);
@@ -56,7 +56,7 @@ function commandLogError(isShow, content) {
 }
 
 function commandRunBefore(args, callback) {
-  if (args.dryRun) {
+  if (args.dryRun || args.debugger) {
     main();
   } else {
     term.bgBlack.white.underline.bold(
@@ -76,7 +76,8 @@ function commandRunBefore(args, callback) {
     term.bgBlack.white.underline.bold("i18n-kit run!!!");
     term(`\n`);
     callback(() => {
-      term.bgBlack.white.underline.bold("done.\n");
+      term.bgBlack.white.underline.bold("All done.\n");
+      process.exit();
     });
   }
 }
@@ -114,9 +115,16 @@ function formatArgs(args) {
   const processCwd = process.cwd();
   args.processCwd = processCwd;
 
-  if (!path.isAbsolute(args.codeFolderPath)) {
-    args.codeFolderPath = path.resolve(processCwd, args.codeFolderPath);
-  }
+  const needConvertToAbsolutePathKey = [
+    "codeFolderPath",
+    "excelPath",
+    "jsonPath",
+  ];
+  needConvertToAbsolutePathKey.forEach((n) => {
+    if (args.codeFolderPath && !path.isAbsolute(args.codeFolderPath)) {
+      args.codeFolderPath = path.resolve(processCwd, args.codeFolderPath);
+    }
+  });
 
   return args;
 }
