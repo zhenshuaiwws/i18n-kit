@@ -19,16 +19,13 @@
         "src/services",
         "src/locales",
         "-ep",
-        "/Users/zhenshuai/Desktop/test.xlsx",
+        "/Users/zhenshuai/Downloads/18n.xlsx",
         "-ew",
         "1",
         "-ek",
         "1",
         "-el",
-        "2",
-        "-ef",
-        "3",
-        "--dry-run"
+        "2"
       ]
     },
     {
@@ -59,7 +56,7 @@
       "args": [
         "e2j",
         "-ep",
-        "/Users/zhenshuai/Desktop/test.xlsx",
+        "/Users/zhenshuai/Downloads/18n.xlsx",
         "-ew",
         "1",
         "-ek",
@@ -67,7 +64,7 @@
         "-el",
         "2",
         "-jp",
-        "/Users/zhenshuai/Desktop/en.json",
+        "/Users/zhenshuai/Documents/ks/is-recruit-fe/src/locales/en_US.json",
         "--debugger"
       ]
     }

@@ -36,22 +36,22 @@ const excelOptionMap = {
   ),
   excelWorksheetIndex: new Option(
     "-ew, --excel-worksheet-index <number>",
-    "Excel worksheet number.",
+    "Excel worksheet number, start with 1 .",
     true
   ),
   excelKeyColumnIndex: new Option(
     "-ek, --excel-key-column-index <number>",
-    "Translation key column number.",
+    "Translation key column number, start with 1 .",
     true
   ),
   excelLangColumnIndex: new Option(
     "-el, --excel-lang-column-index <number>",
-    "Column number of translated text.",
+    "Column number of translated text, start with 1 .",
     true
   ),
   excelFileColumnIndex: new Option(
     "-ef, --excel-file-column-index <number>",
-    "File path of translation item."
+    "File path of translation item, start with 1 ."
   ),
 };
 

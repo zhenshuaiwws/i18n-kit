@@ -11,10 +11,7 @@ function findDirFiles(parentDirPath) {
     items.forEach((n) => {
       if (n.isDirectory()) {
         loopDir(path.resolve(parentDirPath, n.name));
-      } else if (
-        n.isFile() &&
-        (n.name.includes(".ts") || n.name.includes(".js"))
-      ) {
+      } else if (n.isFile() && (n.name.includes(".ts") || n.name.includes(".js"))) {
         allFilePaths.push(path.resolve(parentDirPath, n.name));
       }
     });
@@ -24,6 +21,7 @@ function findDirFiles(parentDirPath) {
 }
 
 function writeDebugLog(fileName, data) {
+  return;
   let content;
 
   if (_.isArray(data)) {
@@ -59,9 +57,7 @@ function commandRunBefore(args, callback) {
   if (args.dryRun || args.debugger) {
     main();
   } else {
-    term.bgBlack.white.underline.bold(
-      "当前非模拟运行(建议做好备份)，是否继续？ [Y|n]\n"
-    );
+    term.bgBlack.white.underline.bold("当前非模拟运行(建议做好备份)，是否继续？ [Y|n]\n");
     term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] }, function (error, result) {
       if (result) {
         main();
@@ -83,12 +79,7 @@ function commandRunBefore(args, callback) {
 }
 
 function formatArgs(args) {
-  const needConvertToNumberKey = [
-    "excelWorksheetIndex",
-    "excelKeyColumnIndex",
-    "excelLangColumnIndex",
-    "excelFileColumnIndex",
-  ];
+  const needConvertToNumberKey = ["excelWorksheetIndex", "excelKeyColumnIndex", "excelLangColumnIndex", "excelFileColumnIndex"];
   needConvertToNumberKey.forEach((n) => {
     if (args[n] === undefined) {
       return;
@@ -97,7 +88,7 @@ function formatArgs(args) {
 
     // 异常参数处理
     if (args[n] < 1) {
-      term("=> Error: ${n} starts with 1 !");
+      term(`=> Error: ${n} starts with 1 !`);
       process.exit(0);
     }
 
@@ -115,11 +106,7 @@ function formatArgs(args) {
   const processCwd = process.cwd();
   args.processCwd = processCwd;
 
-  const needConvertToAbsolutePathKey = [
-    "codeFolderPath",
-    "excelPath",
-    "jsonPath",
-  ];
+  const needConvertToAbsolutePathKey = ["codeFolderPath", "excelPath", "jsonPath"];
   needConvertToAbsolutePathKey.forEach((n) => {
     if (args.codeFolderPath && !path.isAbsolute(args.codeFolderPath)) {
       args.codeFolderPath = path.resolve(processCwd, args.codeFolderPath);
