@@ -22,8 +22,6 @@ function findDirFiles(parentDirPath) {
 
 function writeDebugLog(fileName, data) {
   return;
-  let content;
-
   if (_.isArray(data)) {
     content = data
       .map((n) => {
@@ -71,10 +69,15 @@ function commandRunBefore(args, callback) {
     term.clear();
     term.bgBlack.white.underline.bold("i18n-kit run!!!");
     term(`\n`);
-    callback(() => {
-      term.bgBlack.white.underline.bold("All done.\n");
+    try {
+      callback(() => {
+        term.bgBlack.white.underline.bold("All done.\n");
+        process.exit();
+      });
+    } catch (error) {
+      term(error);
       process.exit();
-    });
+    }
   }
 }
 
