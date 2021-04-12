@@ -1,8 +1,6 @@
 #!/usr/bin/env node
 
-const path = require("path");
-const { Command, Option, requiredOption } = require("commander");
-const term = require("terminal-kit").terminal;
+const { Command, Option } = require("commander");
 const { version } = require("./package.json");
 const tasks = require("./src/main");
 const utils = require("./src/utils");
@@ -10,49 +8,20 @@ const utils = require("./src/utils");
 const program = new Command();
 program.version(version);
 
-const dryRunOption = new Option(
-  "--dry-run",
-  "Run command without saving the changes to the file system"
-);
+const dryRunOption = new Option("--dry-run", "Run command without saving the changes to the file system");
 const debuggerOption = new Option("--debugger", "debugger");
 
 const codeOptionMap = {
-  codeFolderPath: new Option(
-    "-cp, --code-folder-path <path>",
-    "Code folder path.",
-    true
-  ),
-  codeExcluded: new Option(
-    "-ce, --code-excluded <path...>",
-    "Excluded code folder path."
-  ),
+  codeFolderPath: new Option("-cp, --code-folder-path <path>", "Code folder path.", true),
+  codeExcluded: new Option("-ce, --code-excluded <path...>", "Excluded code folder path."),
 };
 
 const excelOptionMap = {
-  excelPath: new Option(
-    "-ep, --excel-path <path>",
-    "Translate excel file path.",
-    true
-  ),
-  excelWorksheetIndex: new Option(
-    "-ew, --excel-worksheet-index <number>",
-    "Excel worksheet number, start with 1 .",
-    true
-  ),
-  excelKeyColumnIndex: new Option(
-    "-ek, --excel-key-column-index <number>",
-    "Translation key column number, start with 1 .",
-    true
-  ),
-  excelLangColumnIndex: new Option(
-    "-el, --excel-lang-column-index <number>",
-    "Column number of translated text, start with 1 .",
-    true
-  ),
-  excelFileColumnIndex: new Option(
-    "-ef, --excel-file-column-index <number>",
-    "File path of translation item, start with 1 ."
-  ),
+  excelPath: new Option("-ep, --excel-path <path>", "Translate excel file path.", true),
+  excelWorksheetIndex: new Option("-ew, --excel-worksheet-index <number>", "Excel worksheet number, start with 1 .", true),
+  excelKeyColumnIndex: new Option("-ek, --excel-key-column-index <number>", "Translation key column number, start with 1 .", true),
+  excelLangColumnIndex: new Option("-el, --excel-lang-column-index <number>", "Column number of translated text, start with 1 .", true),
+  excelFileColumnIndex: new Option("-ef, --excel-file-column-index <number>", "File path of translation item, start with 1 ."),
 };
 
 const jsonOptionMap = {
@@ -61,9 +30,7 @@ const jsonOptionMap = {
 
 program
   .command("c2e")
-  .description(
-    "Code to Excel, find translation items from the code and output them to excel file."
-  )
+  .description("Code to Excel, find translation items from the code and output them to excel file.")
   .addOption(dryRunOption)
   .addOption(codeOptionMap.codeFolderPath)
   .addOption(codeOptionMap.codeExcluded)
@@ -82,9 +49,7 @@ program
 
 program
   .command("c2j")
-  .description(
-    "Code to JSON, find translation items from the code and output them to lang JSON file."
-  )
+  .description("Code to JSON, find translation items from the code and output them to lang JSON file.")
   .addOption(dryRunOption)
   .addOption(codeOptionMap.codeFolderPath)
   .addOption(codeOptionMap.codeExcluded)
@@ -99,9 +64,7 @@ program
 
 program
   .command("e2j")
-  .description(
-    "Excel to JSON, read the translation items in excel file and output to JSON."
-  )
+  .description("Excel to JSON, read the translation items in excel file and output to JSON.")
   .addOption(dryRunOption)
   .addOption(excelOptionMap.excelPath)
   .addOption(excelOptionMap.excelWorksheetIndex)

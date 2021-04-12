@@ -2,8 +2,11 @@
 
 Help you deal with I18N internationalization, extraction from code based on Babel, import and export excel, generate translation JSON file.
 
-- dry-run option, run command without saving the changes to the file system\
-- extract from code, matching paradigm `i18nTranslate(langKey, langText, langOptions)`
+- dry-run option, run command without saving the changes to the file system.
+- Extract from code, matching paradigm `i18nTranslate(langKey, langText, langOptions)`.
+- Error message
+  - Different text from key.
+  - Father son conflict.
 
 # All commands
 

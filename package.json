@@ -1,8 +1,11 @@
 {
   "name": "i18n-kit",
   "version": "0.0.4",
-  "description": "",
-  "author": "zhenshuai",
+  "description": "Help you deal with I18N internationalization, extraction from code based on Babel, import and export excel, generate translation JSON file.",
+  "author": {
+    "name": "zhenshuai",
+    "email": "231640921@qq.com"
+  },
   "main": "index.js",
   "bin": {
     "i18n-kit": "index.js"
