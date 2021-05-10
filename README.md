@@ -12,7 +12,7 @@ Help you deal with I18N internationalization, extraction from code based on Babe
 
 ## Code to excel command
 
-c2e: Code to Excel, find translation items from the code and output them to excel file.
+code2excel: Code to Excel, find translation items from the code and output them to excel file.
 
 ### Options
 
@@ -28,7 +28,7 @@ c2e: Code to Excel, find translation items from the code and output them to exce
 
 ## Code to json command
 
-c2j: Code to JSON, find translation items from the code and output them to lang JSON file.
+code2json: Code to JSON, find translation items from the code and output them to lang JSON file.
 
 ### Options
 
@@ -40,7 +40,7 @@ c2j: Code to JSON, find translation items from the code and output them to lang 
 
 ## Excel to json command
 
-e2j: Excel to JSON, read the translation items in excel file and output to JSON.
+excel2json: Excel to JSON, read the translation items in excel file and output to JSON.
 
 ### Options
 
