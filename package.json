@@ -1,6 +1,6 @@
 {
   "name": "i18n-kit",
-  "version": "0.0.4",
+  "version": "0.1.0",
   "description": "Help you deal with I18N internationalization, extraction from code based on Babel, import and export excel, generate translation JSON file.",
   "author": {
     "name": "zhenshuai",
@@ -12,15 +12,17 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "c2e": "node index.js c2e -cp ../is-recruit-fe/src -ce src/campus-services src/services src/locales -ep /Users/zhenshuai/Desktop/test.xlsx -ew 1 -ek 1 -el 2 -ef 3",
-    "c2j": "node index.js c2j -cp ../is-recruit-fe/src -ce src/campus-services src/services src/locales -jp /Users/zhenshuai/Desktop/en.json",
+    "c2e": "node index.js code2excel -cp ../is-recruit-fe/src -ce src/campus-services src/services src/locales -ep /Users/zhenshuai/Desktop/test.xlsx -ew 1 -ek 1 -el 2 -ef 3",
+    "c2j": "node index.js code2json -p ../is-recruit-fe/src -ce src/campus-services src/services src/locales -jp /Users/zhenshuai/Desktop/en.json",
     "e2j": "node index.js e2j -ep /Users/zhenshuai/Desktop/test.xlsx -ew 1 -ek 1 -el 2 -jp /Users/zhenshuai/Desktop/en.json"
   },
   "license": "MIT",
   "dependencies": {
+    "@babel/generator": "^7.14.1",
     "@babel/parser": "^7.13.10",
     "@babel/plugin-proposal-decorators": "^7.13.5",
     "@babel/plugin-transform-typescript": "^7.13.0",
+    "@babel/traverse": "^7.14.0",
     "ast-query": "^2.0.0",
     "babel-traverse": "^6.26.0",
     "commander": "^7.1.0",
@@ -31,5 +33,9 @@
     "single-line-log": "^1.1.2",
     "terminal-kit": "^2.0.5"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "eslint": "^7.25.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1"
+  }
 }

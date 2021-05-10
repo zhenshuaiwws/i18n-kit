@@ -1,9 +1,7 @@
-"use strict";
-
-const _ = require("lodash");
-const codeService = require("./code");
-const jsonService = require("./json");
-const excelService = require("./excel");
+const _ = require('lodash');
+const codeService = require('./code');
+const jsonService = require('./json');
+const excelService = require('./excel');
 
 /**
  * 从 Code 中查找翻译项，输出到 Json 中
@@ -25,7 +23,7 @@ async function taskCodeToExcel(args) {
   codeService.init(args);
 
   await excelService.init(args);
-  excelService.execute(_.sortBy(codeService.translations, "file"));
+  excelService.execute(_.sortBy(codeService.translations, 'file'));
   if (!args.dryRun) {
     await excelService.exportToFile();
   }
@@ -48,11 +46,13 @@ async function taskExcelToJson(args) {
 /**
  * 把 Json 中的翻译项，同步到 Code 中
  */
-async function taskJsonToCode(args) {}
+async function taskJsonToCode(args) {
+  console.log(args);
+}
 
 module.exports = {
   taskCodeToJson,
   taskCodeToExcel,
   taskExcelToJson,
-  taskJsonToCode,
+  taskJsonToCode
 };

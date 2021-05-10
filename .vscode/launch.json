@@ -35,10 +35,10 @@
       "skipFiles": ["<node_internals>/**"],
       "program": "${workspaceFolder}/index.js",
       "args": [
-        "c2j",
-        "-cp",
+        "code2json",
+        "-p",
         "../is-recruit-fe/src",
-        "--code-excluded",
+        "-e",
         "src/campus-services",
         "src/services",
         "src/locales",

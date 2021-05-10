@@ -1,18 +1,18 @@
-const fs = require("fs");
-const path = require("path");
-const _ = require("lodash");
-const term = require("terminal-kit").terminal;
+const fs = require('fs');
+const path = require('path');
+const _ = require('lodash');
+const term = require('terminal-kit').terminal;
 
 function findDirFiles(parentDirPath) {
   const allFilePaths = [];
-  function loopDir(parentDirPath) {
-    const items = fs.readdirSync(parentDirPath, { withFileTypes: true });
+  function loopDir(parent) {
+    const items = fs.readdirSync(parent, { withFileTypes: true });
 
     items.forEach((n) => {
       if (n.isDirectory()) {
-        loopDir(path.resolve(parentDirPath, n.name));
-      } else if (n.isFile() && (n.name.includes(".ts") || n.name.includes(".js"))) {
-        allFilePaths.push(path.resolve(parentDirPath, n.name));
+        loopDir(path.resolve(parent, n.name));
+      } else if (n.isFile() && (n.name.includes('.ts') || n.name.includes('.js'))) {
+        allFilePaths.push(path.resolve(parent, n.name));
       }
     });
   }
@@ -21,25 +21,24 @@ function findDirFiles(parentDirPath) {
 }
 
 function writeDebugLog(fileName, data) {
-  return;
+  let content;
   if (_.isArray(data)) {
     content = data
       .map((n) => {
         if (_.isObject(n)) {
           return JSON.stringify(n);
-        } else {
-          return n;
         }
+        return n;
       })
-      .join("\n");
+      .join('\n');
   } else if (_.isObject(data)) {
-    content = JSON.stringify(data, "", 2);
+    content = JSON.stringify(data, '', 2);
   } else {
     content = data;
   }
 
-  fs.writeFileSync(path.resolve(process.cwd(), "./log/", fileName), content, {
-    encoding: "utf-8",
+  fs.writeFileSync(path.resolve(process.cwd(), './log/', fileName), content, {
+    encoding: 'utf-8'
   });
 }
 
@@ -48,30 +47,17 @@ function commandLogError(isIgnore, content) {
     return;
   }
   term.brightRed(content);
-  term("\n");
+  term('\n');
 }
 
-function commandRunBefore(args, callback) {
-  if (args.dryRun || args.debugger) {
-    main();
-  } else {
-    term.bgBlack.white.underline.bold("当前非模拟运行(建议做好备份)，是否继续？ [Y|n]\n");
-    term.yesOrNo({ yes: ["y", "ENTER"], no: ["n"] }, function (error, result) {
-      if (result) {
-        main();
-      } else {
-        process.exit();
-      }
-    });
-  }
-
+function dryRunConfirm(args, callback) {
   function main() {
     term.clear();
-    term.bgBlack.white.underline.bold("i18n-kit run!!!");
-    term(`\n`);
+    term.bgBlack.white.underline.bold('i18n-kit running...');
+    term('\n');
     try {
       callback(() => {
-        term.bgBlack.white.underline.bold("All done.\n");
+        term.bgBlack.white.underline.bold('done.\n');
         process.exit();
       });
     } catch (error) {
@@ -79,50 +65,115 @@ function commandRunBefore(args, callback) {
       process.exit();
     }
   }
+
+  if (args.dryRun || args.debugger) {
+    main();
+  } else {
+    term.bgBlack.white.underline.bold('current non dry run, continue? [y|n]\n');
+    term.yesOrNo({ yes: ['y', 'ENTER'], no: ['n'] }, (error, result) => {
+      if (result) {
+        main();
+      } else {
+        process.exit();
+      }
+    });
+  }
 }
 
 function formatArgs(args) {
-  const needConvertToNumberKey = ["excelWorksheetIndex", "excelKeyColumnIndex", "excelLangColumnIndex", "excelFileColumnIndex"];
+  const result = _.cloneDeep(args);
+  const needConvertToNumberKey = [
+    'excelWorksheetIndex',
+    'excelKeyColumnIndex',
+    'excelLangColumnIndex',
+    'excelFileColumnIndex'
+  ];
   needConvertToNumberKey.forEach((n) => {
-    if (args[n] === undefined) {
+    if (result[n] === undefined) {
       return;
     }
-    args[n] = Number(args[n]);
+    result[n] = Number(result[n]);
 
     // 异常参数处理
-    if (args[n] < 1) {
+    if (result[n] < 1) {
       term(`=> Error: ${n} starts with 1 !`);
       process.exit(0);
     }
 
     // 兼容处理，工作表顺序从1开始
-    if (n === "excelWorksheetIndex") {
-      args[n]--;
+    if (n === 'excelWorksheetIndex') {
+      result[n] -= 1;
     }
   });
 
-  const needConvertToBooleanKey = ["logError"];
+  const needConvertToBooleanKey = ['logError'];
   needConvertToBooleanKey.forEach((n) => {
-    args[n] = !(args[n] === "false");
+    result[n] = !(result[n] === 'false');
   });
 
   const processCwd = process.cwd();
-  args.processCwd = processCwd;
+  result.processCwd = processCwd;
 
-  const needConvertToAbsolutePathKey = ["codeFolderPath", "excelPath", "jsonPath"];
+  const needConvertToAbsolutePathKey = ['codeFolderPath', 'excelPath', 'jsonPath'];
   needConvertToAbsolutePathKey.forEach((n) => {
-    if (args.codeFolderPath && !path.isAbsolute(args.codeFolderPath)) {
-      args.codeFolderPath = path.resolve(processCwd, args.codeFolderPath);
+    if (result.codeFolderPath && !path.isAbsolute(result.codeFolderPath)) {
+      result.codeFolderPath = path.resolve(processCwd, result.codeFolderPath);
     }
   });
 
-  return args;
+  return result;
+}
+
+/**
+ * 深度对比两个对象
+ * @param  {Object} from
+ * @param  {Object} to
+ * @return {Array}
+ */
+function deepDiff(from, to) {
+  const changes = {};
+  const changeList = [];
+
+  const buildPath = (path, obj, key) => (_.isUndefined(path) ? key : `${path}.${key}`);
+
+  const walk = (fromObject, toObject, path) => {
+    for (const key of _.keys(fromObject)) {
+      const currentPath = buildPath(path, fromObject, key);
+      if (!_.has(toObject, key)) {
+        changes[currentPath] = { from: _.get(fromObject, key) };
+        changeList.push([currentPath, { from: _.get(fromObject, key) }]);
+      }
+    }
+
+    for (const [key, to] of _.entries(toObject)) {
+      const currentPath = buildPath(path, toObject, key);
+      if (!_.has(fromObject, key)) {
+        changes[currentPath] = { to };
+        changeList.push([currentPath, { to }]);
+      } else {
+        const from = _.get(fromObject, key);
+        if (!_.isEqual(from, to)) {
+          if (_.isObjectLike(to) && _.isObjectLike(from)) {
+            walk(from, to, currentPath);
+          } else {
+            changes[currentPath] = { from, to };
+            changeList.push([currentPath, { from, to }]);
+          }
+        }
+      }
+    }
+  };
+
+  walk(from, to);
+
+  return changeList;
 }
 
 module.exports = {
-  commandRunBefore,
+  dryRunConfirm,
   commandLogError,
   formatArgs,
   findDirFiles,
-  writeDebugLog,
+  deepDiff,
+  writeDebugLog
 };
