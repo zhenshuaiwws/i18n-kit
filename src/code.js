@@ -63,6 +63,8 @@ class CodeServiceFactory {
 
     const shortFile = file.replace(this.config.codeFolderPath, '');
 
+    term(`=> Code: file ${shortFile}\n`);
+
     const ast = babelParse(fileContent, {
       sourceType: 'module',
       plugins: ['jsx', 'typescript', 'classProperties', 'decorators-legacy'],
@@ -76,6 +78,16 @@ class CodeServiceFactory {
           let rawKey = args[0].value;
           let text;
 
+          if (!args[1]) {
+            this.errorTranslations.push({
+              rawKey,
+              text,
+              file,
+              shortFile,
+              error: '没有找到翻译默认值'
+            });
+            return;
+          }
           if (args[1].type !== 'StringLiteral') {
             text = babelGenerator(args[1]).code;
           } else {

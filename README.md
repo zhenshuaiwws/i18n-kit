@@ -3,10 +3,25 @@
 Help you deal with I18N internationalization, extraction from code based on Babel, import and export excel, generate translation JSON file.
 
 - dry-run option, run command without saving the changes to the file system.
-- Extract from code, matching paradigm `i18nTranslate(langKey, langText, langOptions)`.
 - Error message
   - Different text from key.
   - Father son conflict.
+- Extract from code, matching paradigm `i18nTranslate(langKey, langText, langTextOptions)`
+
+```javascript
+import React from 'react';
+import i18n from 'i18next';
+
+function i18nTranslate(key: string, text: string, option: {}) {
+  // your code
+  // ...
+  return i18n.t(key);
+}
+
+export default function BatchSendPage() {
+  return <div>{i18nTranslate('common.name', '我的名字{name}', { name: 'xiaohong' })}</div>;
+}
+```
 
 # All commands
 
