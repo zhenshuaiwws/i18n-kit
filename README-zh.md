@@ -5,6 +5,7 @@
 - `--dry-run` 演习运行，用来效验和发现错误，如下。
   - 翻译同 key 不同翻译
   - 翻译 key 父子冲突
+- `--log` 打印日志，输出错误的详细记录。
 - 工具会匹配代码格式为`i18nTranslate(langKey, langText, langTextOptions)`
 
 ```javascript

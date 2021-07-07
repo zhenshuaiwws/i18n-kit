@@ -1,6 +1,6 @@
 {
   "name": "i18n-kit",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Help you deal with I18N internationalization, extraction from code based on Babel, import and export excel, generate translation JSON file.",
   "author": {
     "name": "zhenshuai",
@@ -12,7 +12,9 @@
   },
   "repository": "https://github.com/zhenshuaiwws/i18n-kit",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "node index.js code2json --code-folder-path demo/code --json-path demo/lang/zh.json",
+    "test-log": "node index.js code2json --code-folder-path demo/code --json-path demo/lang/zh.json --log",
+    "test2": "node index.js code2excel --code-folder-path demo/code --excel-path demo/excel/t.xlsx"
   },
   "license": "MIT",
   "dependencies": {

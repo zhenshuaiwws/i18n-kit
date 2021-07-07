@@ -6,6 +6,7 @@ Help you deal with I18N internationalization, extraction from code based on Babe
 - Error message
   - Different text from key.
   - Father son conflict.
+- log option, detailed record of output error.
 - Extract from code, matching paradigm `i18nTranslate(langKey, langText, langTextOptions)`
 
 ```javascript

@@ -28,8 +28,13 @@ class ExcelServiceFactory {
     term('=> Excel...\n');
 
     this.config = config;
-
-    const worksheets = await this.workbook.xlsx.readFile(config.excelPath);
+    let worksheets;
+    try {
+      worksheets = await this.workbook.xlsx.readFile(config.excelPath);
+    } catch (error) {
+      utils.commandLogError(error);
+      process.exit(0);
+    }
     this.worksheet = worksheets.worksheets[config.excelWorksheetIndex];
 
     this.readFromExcel();
@@ -137,17 +142,11 @@ class ExcelServiceFactory {
       if (_.isObject(find)) {
         n.error = 'key冲突(类似的key会导致覆盖丢失其他翻译)';
         this.errorTranslations.push(n);
-        utils.commandLogError(
-          this.config.dryRun,
-          `=> Excel traverse error: ${n.rawKey} ${n.error}`
-        );
+        utils.commandLogError(`=> Excel traverse error: ${n.rawKey} ${n.error}`);
       } else if (find && find !== n.text) {
         n.error = '同key不同翻译';
         this.errorTranslations.push(n);
-        utils.commandLogError(
-          this.config.dryRun,
-          `=> Excel traverse error: ${n.rawKey} ${n.error}`
-        );
+        utils.commandLogError(`=> Excel traverse error: ${n.rawKey} ${n.error}`);
       } else {
         _.set(this.translationObject, n.rawKey, n.text);
       }

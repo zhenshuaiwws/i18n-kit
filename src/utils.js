@@ -20,7 +20,13 @@ function findDirFiles(parentDirPath) {
   return allFilePaths;
 }
 
-function writeDebugLog(fileName, data) {
+function writeLog(config, fileName, data) {
+  term(config.log);
+  term('\n');
+  if (!config.log) {
+    return;
+  }
+
   let content;
   if (_.isArray(data)) {
     content = data
@@ -36,16 +42,12 @@ function writeDebugLog(fileName, data) {
   } else {
     content = data;
   }
-
-  fs.writeFileSync(path.resolve(process.cwd(), './log/', fileName), content, {
+  fs.writeFileSync(path.resolve(process.cwd(), './', fileName), content, {
     encoding: 'utf-8'
   });
 }
 
-function commandLogError(isIgnore, content) {
-  if (isIgnore) {
-    return;
-  }
+function commandLogError(content) {
   term.brightRed(content);
   term('\n');
 }
@@ -66,7 +68,7 @@ function dryRunConfirm(args, callback) {
     }
   }
 
-  if (args.dryRun || args.debugger) {
+  if (!args.dryRun) {
     main();
   } else {
     term.bgBlack.white.underline.bold('current non dry run, continue? [y|n]\n');
@@ -175,5 +177,5 @@ module.exports = {
   formatArgs,
   findDirFiles,
   deepDiff,
-  writeDebugLog
+  writeLog
 };

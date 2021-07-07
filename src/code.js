@@ -53,7 +53,7 @@ class CodeServiceFactory {
       });
     }
     term(`=> Code find: ${this.files.length} files(.ts,.js).\n`);
-    utils.writeDebugLog('files', this.files);
+    utils.writeLog(this.config, 'i18n-kit-files-log', this.files);
   }
 
   findTranslateInFile(file) {
@@ -65,11 +65,17 @@ class CodeServiceFactory {
 
     term(`=> Code: file ${shortFile}\n`);
 
-    const ast = babelParse(fileContent, {
-      sourceType: 'module',
-      plugins: ['jsx', 'typescript', 'classProperties', 'decorators-legacy'],
-      presets: ['@babel/preset-typescript']
-    });
+    let ast;
+    try {
+      ast = babelParse(fileContent, {
+        sourceType: 'module',
+        plugins: ['jsx', 'typescript', 'classProperties', 'decorators-legacy'],
+        presets: ['@babel/preset-typescript']
+      });
+    } catch (error) {
+      utils.commandLogError(error);
+      process.exit(0);
+    }
 
     babelTraverse(ast, {
       CallExpression: (path) => {
@@ -132,11 +138,11 @@ class CodeServiceFactory {
       if (_.isObject(find)) {
         n.error = 'key冲突(类似的key会导致覆盖丢失其他翻译)';
         this.errorTranslations.push(n);
-        utils.commandLogError(this.config.dryRun, `=> Code traverse error: ${n.rawKey} ${n.error}`);
+        utils.commandLogError(`=> Code traverse error: ${n.rawKey} ${n.error}`);
       } else if (find && find !== n.text) {
         n.error = '同key不同翻译';
         this.errorTranslations.push(n);
-        utils.commandLogError(this.config.dryRun, `=> Code traverse error: ${n.rawKey} ${n.error}`);
+        utils.commandLogError(`=> Code traverse error: ${n.rawKey} ${n.error}`);
       } else {
         _.set(this.translationObject, n.rawKey, n.text);
       }

@@ -24,7 +24,7 @@ class JsonServiceFactory {
     try {
       fse.statSync(this.config.jsonPath);
     } catch (error) {
-      utils.commandLogError(false, `=> Json Error: ${this.config.jsonPath} no such file.\n`);
+      utils.commandLogError(`=> Json Error: ${this.config.jsonPath} no such file.\n`);
       process.exit();
     }
   }
@@ -38,7 +38,7 @@ class JsonServiceFactory {
       try {
         langObject = JSON.parse(`${jsonContent}`);
       } catch (error) {
-        utils.commandLogError(true, `=> Json Error: JSON syntax error in ${this.config.jsonPath}`);
+        utils.commandLogError(`=> Json Error: JSON syntax error in ${this.config.jsonPath}`);
       }
       this.langObject = langObject;
     }
@@ -52,7 +52,7 @@ class JsonServiceFactory {
     term.bgBlack.brightYellow.bold(
       `=> Json: add ${addCount} items, update ${updateCount} items. \n`
     );
-    utils.writeDebugLog('jsonDiff', diff);
+    utils.writeLog(this.config, 'i18n-kit-json-diff-log', diff);
 
     _.merge(this.langObject, translationObject);
   }
