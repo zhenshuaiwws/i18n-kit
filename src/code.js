@@ -79,6 +79,20 @@ class CodeServiceFactory {
 
     babelTraverse(ast, {
       CallExpression: (path) => {
+        // if (this.config.config) {
+        //   term(this.config.config);
+        //   term('\n');
+
+        //   // eslint-disable-next-line global-require
+        //   // const a = require(this.config.config);
+        //   // // const customeContent = fs.readFileSync(this.config.config, {
+        //   // //   encoding: 'utf-8'
+        //   // // });
+        //   // term(JSON.stringify(a));
+        //   term('\n');
+        //   return;
+        // }
+
         if (path.node.callee.name === 'i18nTranslate') {
           const args = path.node.arguments;
           let rawKey = args[0].value;

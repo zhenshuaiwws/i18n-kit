@@ -14,6 +14,7 @@ const dryRunOption = new Option(
 );
 // const debuggerOption = new Option('--debugger', 'debugger');
 const logOption = new Option('--log', 'log');
+const configOption = new Option('--config <path>', 'config');
 
 const codeOptionMap = {
   codeFolderPath: new Option('-cp, --code-folder-path <path>', 'Code folder path.', true),
@@ -52,6 +53,7 @@ program
   .description('Find translation items from the code and output them to excel file.')
   .addOption(dryRunOption)
   .addOption(logOption)
+  .addOption(configOption)
   .addOption(codeOptionMap.codeFolderPath)
   .addOption(codeOptionMap.codeExcluded)
   .addOption(excelOptionMap.excelPath)
@@ -72,6 +74,7 @@ program
   .description('Find translation items from the code and output them to lang JSON file.')
   .addOption(dryRunOption)
   .addOption(logOption)
+  .addOption(configOption)
   .addOption(codeOptionMap.codeFolderPath)
   .addOption(codeOptionMap.codeExcluded)
   .addOption(jsonOptionMap.jsonPath)
@@ -88,6 +91,7 @@ program
   .description('Read the translation items in excel file and output to JSON.')
   .addOption(dryRunOption)
   .addOption(logOption)
+  .addOption(configOption)
   .addOption(excelOptionMap.excelPath)
   .addOption(excelOptionMap.excelWorksheetIndex)
   .addOption(excelOptionMap.excelKeyColumnIndex)

@@ -116,7 +116,7 @@ function formatArgs(args) {
   const processCwd = process.cwd();
   result.processCwd = processCwd;
 
-  const needConvertToAbsolutePathKey = ['codeFolderPath', 'excelPath', 'jsonPath'];
+  const needConvertToAbsolutePathKey = ['codeFolderPath', 'excelPath', 'jsonPath', 'config'];
   needConvertToAbsolutePathKey.forEach((n) => {
     if (result.codeFolderPath && !path.isAbsolute(result.codeFolderPath)) {
       result.codeFolderPath = path.resolve(processCwd, result.codeFolderPath);

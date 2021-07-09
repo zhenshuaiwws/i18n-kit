@@ -13,6 +13,7 @@
   "repository": "https://github.com/zhenshuaiwws/i18n-kit",
   "scripts": {
     "test": "node index.js code2json --code-folder-path demo/code --json-path demo/lang/zh.json",
+    "test-config": "node index.js code2json --code-folder-path demo/code --json-path demo/lang/zh.json --config demo/config.js",
     "test-log": "node index.js code2json --code-folder-path demo/code --json-path demo/lang/zh.json --log",
     "test2": "node index.js code2excel --code-folder-path demo/code --excel-path demo/excel/t.xlsx"
   },
